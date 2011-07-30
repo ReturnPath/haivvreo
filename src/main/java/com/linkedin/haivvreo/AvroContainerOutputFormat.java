@@ -51,7 +51,7 @@ public class AvroContainerOutputFormat implements HiveOutputFormat<LongWritable,
     GenericDatumWriter<GenericRecord> gdw = new GenericDatumWriter<GenericRecord>(schema);
     DataFileWriter<GenericRecord> dfw = new DataFileWriter<GenericRecord>(gdw);
 
-    dfw.create(schema, path.getFileSystem(jobConf).create(path));
+    dfw.create(schema, path.getFileSystem(jobConf).create(path.suffix(".avro")));
     return new AvroGenericRecordWriter(dfw);
   }
 
