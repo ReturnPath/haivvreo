@@ -39,18 +39,21 @@ class AvroObjectInspectorGenerator {
   final private ObjectInspector oi;
 
   public AvroObjectInspectorGenerator(Schema schema) throws SerDeException {
-    verifySchemaIsARecord(schema);
+    this(generateColumnNames(verifySchemaIsARecord(schema)), SchemaToTypeInfo.generateColumnTypes(schema));
+  }
 
-    this.columnNames = generateColumnNames(schema);
-    this.columnTypes = SchemaToTypeInfo.generateColumnTypes(schema);
+  public AvroObjectInspectorGenerator(List<String> columnNames, List<TypeInfo> columnTypes) throws SerDeException {
+    this.columnNames = columnNames;
+    this.columnTypes = columnTypes;
     assert columnNames.size() == columnTypes.size();
     this.oi = createObjectInspector();
   }
 
-  private void verifySchemaIsARecord(Schema schema) throws SerDeException {
+  private static Schema verifySchemaIsARecord(Schema schema) throws SerDeException {
     if(!schema.getType().equals(Schema.Type.RECORD))
       throw new HaivvreoException("Schema for table must be of type RECORD. " +
           "Received type: " + schema.getType());
+    return schema;
   }
 
   public List<String> getColumnNames() {
@@ -133,7 +136,7 @@ class AvroObjectInspectorGenerator {
            c.equals(ObjectInspector.Category.UNION);
   }
 
-  private List<String> generateColumnNames(Schema schema) {
+  private static List<String> generateColumnNames(Schema schema) {
     List<Schema.Field> fields = schema.getFields();
     List<String> fieldsList = new ArrayList<String>(fields.size());
 
